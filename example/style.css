@@ -23,6 +23,11 @@ pre code {
   padding: 8px 0;
 }
 
+/* Override button style */
+.placeholder {
+  font: 16px serif;
+}
+
 .Dropdown {
   position: relative;
 }
@@ -39,6 +44,8 @@ pre code {
   outline: none;
   padding: 8px 52px 8px 10px;
   transition: all 200ms ease;
+  width: 100%;
+  text-align: left;
 }
 
 .Dropdown-control:hover {
