@@ -97,7 +97,7 @@ var Dropdown = React.createClass({
 
     return (
       React.createElement("div", {className: dropdownClass}, 
-        React.createElement("div", {className: "Dropdown-control", onMouseDown: this.handleMouseDown, onTouchEnd: this.handleMouseDown}, 
+        React.createElement("button", {className: "Dropdown-control", onMouseDown: this.handleMouseDown, onTouchEnd: this.handleMouseDown}, 
           value, 
           React.createElement("span", {className: "Dropdown-arrow"})
         ), 
