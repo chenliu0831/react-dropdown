@@ -7,6 +7,12 @@ var Dropdown = React.createClass({
 
   displayName: 'Dropdown',
 
+  propTypes: {
+    value: React.PropTypes.object,
+    options: React.PropTypes.array,
+    onChange: React.PropTypes.func,
+  },
+
   getInitialState: function() {
     return {
       selected: undefined,
