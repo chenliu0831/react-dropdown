@@ -130,7 +130,7 @@ var Dropdown = React.createClass({
   render: function() {
     var value = ''
 
-    value = (React.createElement("div", {className: this.props.placeholderClassName}, this.state.selected.label))
+    value = (this.state.selected.label);
     var menu = this.state.isOpen ? React.createElement("div", {className: this.props.menuClassName}, this.buildMenu()) : null
 
     var dropdownClasses = {};
