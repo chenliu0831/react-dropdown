@@ -7,17 +7,67 @@ var Dropdown = React.createClass({
 
   displayName: 'Dropdown',
 
+  propTypes: {
+    value: React.PropTypes.object,
+    options: React.PropTypes.array,
+    onChange: React.PropTypes.func,
+
+    className: React.PropTypes.string,
+    isOpenClassName: React.PropTypes.string,
+    controlClassName: React.PropTypes.string,
+    arrowClassName: React.PropTypes.string,
+    placeholderClassName: React.PropTypes.string,
+
+    noSelectionMessage: React.PropTypes.string,
+
+    menuClassName: React.PropTypes.string,
+    optionClassName: React.PropTypes.string,
+    isSelectedClassName: React.PropTypes.string,
+    groupClassName: React.PropTypes.string,
+    groupTitleClassName: React.PropTypes.string,
+
+    noResultsMessage: React.PropTypes.string,
+    noResultsClassName: React.PropTypes.string,
+  },
+
+  getDefaultProps: function () {
+    return {
+      className: 'Dropdown',
+      isOpenClassName: 'is-open',
+      controlClassName: 'Dropdown-control',
+      arrowClassName: 'Dropdown-arrow',
+      placeholderClassName: 'placeholder',
+
+      noSelectionMessage: 'Select\u2026',
+
+      menuClassName: 'Dropdown-menu',
+      optionClassName: 'Dropdown-option',
+      isSelectedClassName: 'is-selected',
+      groupClassName: 'group',
+      groupTitleClassName: 'title',
+
+      noOptionsMessage: 'No options found',
+      noOptionsClassName: 'Dropdown-noresults',
+    };
+  },
+
   getInitialState: function() {
     return {
       selected: undefined,
+      hovered: undefined,
       isOpen: false
     }
   },
 
   componentWillMount: function() {
+    document.body.addEventListener("click", this.handleBodyClick, true);
     this.setState({
       selected: this.props.value || { label: 'Select...', value: '' }
     })
+  },
+
+  componentWillUnmount: function () {
+    document.body.removeEventListener("click", this.handleBodyClick, true);
   },
 
   componentWillReceiveProps: function(newProps) {
@@ -26,7 +76,14 @@ var Dropdown = React.createClass({
     }
   },
 
-  handleMouseDown: function(event) {
+  handleBodyClick: function(event) {
+
+    if (this.state.isOpen) {
+      this.setState({isOpen: false});
+    }
+  },
+
+  handleClick: function(event) {
 
     if (event.type == 'mousedown' && event.button !== 0) return
     event.stopPropagation()
@@ -35,6 +92,10 @@ var Dropdown = React.createClass({
     this.setState({
       isOpen: !this.state.isOpen
     })
+  },
+
+  handleOptionMouseOver: function (option) {
+    this.setState({hovered: option});
   },
 
   setValue: function(option) {
@@ -55,22 +116,25 @@ var Dropdown = React.createClass({
   renderOption: function (option) {
     var optionClass = cx({
       'Dropdown-option': true,
-      'is-selected': option == this.state.selected
+      'is-selected': (option == this.state.hovered)
     })
 
-    return <div key={option.value} className={optionClass} onMouseDown={this.setValue.bind(this, option)} onClick={this.setValue.bind(this, option)}>{option.label}</div>
+    return <div key={option.value} className={optionClass} 
+                onMouseOver={this.handleOptionMouseOver.bind(this)}
+                onMouseDown={this.setValue.bind(this, option)} 
+                onClick={this.setValue.bind(this, option)}>{option.label}</div>
   },
 
   buildMenu: function() {
     var ops = this.props.options.map(function(option) {
 
       if (option.type == 'group') {
-        var groupTitle = (<div className='title'>{option.name}</div>)
+        var groupTitle = (<div className={this.props.groupTitleClassName}>{option.name}</div>)
         var _options = option.items.map(function(item) {
           return this.renderOption(item)
         }.bind(this))
         return (
-          <div className='group' key={option.name}>
+          <div className={this.props.groupClassName} key={option.name}>
             {groupTitle}
             {_options}
           </div>
@@ -81,29 +145,31 @@ var Dropdown = React.createClass({
 
     }.bind(this))
 
-    return ops.length ? ops : <div className='Dropdown-noresults'>No opitons found</div>
+    return ops.length ? ops : <div className={this.props.noOptionsClassName}>
+                              this.props.noResultsMessage
+                              </div>;
   },
 
   render: function() {
     var value = ''
 
-    value = (<div className='placeholder'>{this.state.selected.label}</div>)
-    var menu = this.state.isOpen ? <div className='Dropdown-menu'>{this.buildMenu()}</div> : null
+    value = (this.state.selected.label);
 
-    var dropdownClass = cx({
-      'Dropdown': true,
-      'is-open': this.state.isOpen
-    })
+    var menu = this.state.isOpen ? <div className={this.props.menuClassName}>{this.buildMenu()}</div> : null
+
+    var dropdownClasses = {};
+    dropdownClasses[this.props.className] = true;
+    dropdownClasses[this.props.isOpenClassName] = this.state.isOpen;
 
     return (
-      <div className={dropdownClass}>
-        <div className='Dropdown-control' onMouseDown={this.handleMouseDown} onTouchEnd={this.handleMouseDown}>
+      <div className={dropdownClasses}>
+        <div className={this.props.controlClassName} onClick={this.handleClick} onTouchEnd={this.handleClick}>
           {value}
-          <span className='Dropdown-arrow' />
+          <span className={this.props.arrowClassName} />
         </div>
         {menu}
       </div>
-    )
+    );
   }
 
 })
